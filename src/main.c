@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
     /* Configurations for this Schrodinger, can be changed using comman-line arguments */
     Config config;
     config.useDVR = true;
+    config.onlyValues = false;
     config.N = 256;
     config.a = 1.0;
     config.p = 0.05;
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
         for (int i = 1; i <= N; ++i) {
             for (int j = 1; j <= N; ++j) {
                 if (i == j) {
-                    H[IDX_CM(N,i,j)] = M_PI*M_PI*(1+2/(N*N))/3 + P*P*config.a*config.a*(i-N/2)*(i-N/2);
+                    H[IDX_CM(N,i,j)] = M_PI*M_PI*(1+2.0/(N*N))/3 + P*P*config.a*config.a*(i-N/2)*(i-N/2);
                 }
                 else {
                     H[IDX_CM(N,i,j)] = 2*M_PI*M_PI*((i+j)%2==0 ? 1 : -1)/(sin(M_PI*(i-j)/N)*sin(M_PI*(i-j)/N))/(N*N);
@@ -95,8 +96,14 @@ int main(int argc, char** argv) {
         }
     }
 
+    char val_vec;
+    if (config.onlyValues)
+        val_vec = 'N';
+    else
+        val_vec = 'V';
+
     /* The actual solving LoL */
-    LAPACKE_dsyevr(LAPACK_COL_MAJOR, 'V', 'A', 'U', N, H, N, 0.0, 0.0, 1, 20, 0.0, &m, w, z, N, isuppz);
+    LAPACKE_dsyevr(LAPACK_COL_MAJOR, val_vec, 'A', 'U', N, H, N, 0.0, 0.0, 1, 20, 0.0, &m, w, z, N, isuppz);
 
 
     /* Files for the eigenvalues and eigenvectors */
@@ -110,12 +117,12 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i != N; ++i) {
         /* First column: E/hw, second: deltaE/hw*/
-        fprintf(f_eval, "%.20le\t%.20le\n", w[i]/(2*P*config.a*config.a), fabs(w[i]/(2*P*config.a*config.a)-(i+0.5)));
+        fprintf(f_eval, "%.26le\t%.26le\n", w[i]/(2*P*config.a), fabs(w[i]/(2*P*config.a)-(i+0.5)));
     }
 
     /* Writing out only 50 first eigenvectors */
-    for (int j = 1; j <= 50; ++j) {
-        for (int i = 1; i <= N; ++i) {
+    for (int j = 1; j <= N; ++j) {
+        for (int i = 1; i <= 50; ++i) {
             fprintf(f_evec, "%.6le ", z[IDX_CM(N,j,i)]);
         }
         fputc('\n', f_evec);

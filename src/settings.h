@@ -7,6 +7,7 @@
 /* Defines under what configuration the program will run */
 typedef struct {
     bool useDVR;
+    bool onlyValues;
     int N;
     double a;
     double p;

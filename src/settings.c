@@ -15,7 +15,7 @@ void setSetting(Config* config, char* s) {
     }
 
     int n = INT_MAX;
-    const char* variableList[] = { "useDVR", "N", "a", "p"};
+    const char* variableList[] = { "useDVR", "onlyValues", "N", "a", "p"};
     for (int i = 0; i != (int)sizeof(variableList)/sizeof(variableList[0]); ++i) {
         if (!strcmp(token, variableList[i])) {
             n = i;
@@ -31,12 +31,18 @@ void setSetting(Config* config, char* s) {
                 config->useDVR = false;
             break;
         case 1:
-            config->N = atoi(value);
+            if (!strcmp(value, "True") || !strcmp(value, "true"))
+                config->onlyValues = true;
+            else
+                config->onlyValues = false;
             break;
         case 2:
-            config->a = strtod(value, NULL);
+            config->N = atoi(value);
             break;
         case 3:
+            config->a = strtod(value, NULL);
+            break;
+        case 4:
             config->p = strtod(value, NULL);
             break;
     }

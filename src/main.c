@@ -24,7 +24,8 @@ int main(int argc, char** argv) {
     config.onlyValues = false;
     config.N = 256;
     config.a = 1.0;
-    config.p = 0.05;
+    config.omega = 0.05;
+    config.x0 = -config.N/2;
 
     /* ================================================ */
     /* === This chunk is for command-line arguments === */
@@ -59,7 +60,9 @@ int main(int argc, char** argv) {
     /* ============================================== */
 
     const int N = config.N;
-    const double P = config.p;
+    const double omega = config.omega;
+    const double a = config.a;
+    const int x0 = config.x0;
     
     double* H = msg_malloc(N*N*sizeof(double), "memory for Hamiltonian"); /* Hamiltonian matrix */
     int m; /* Number of eigenvalues found */
@@ -72,7 +75,7 @@ int main(int argc, char** argv) {
         for (int i = 1; i <= N; ++i) {
             for (int j = 1; j <= N; ++j) {
                 if (i == j) {
-                    H[IDX_CM(N,i,j)] = M_PI*M_PI*(1+2.0/(N*N))/3 + P*P*config.a*config.a*(i-N/2)*(i-N/2);
+                    H[IDX_CM(N,i,j)] = M_PI*M_PI*(1+2.0/(N*N))/3 + omega*omega*a*a*a*a*(i+x0)*(i+x0);
                 }
                 else {
                     H[IDX_CM(N,i,j)] = 2*M_PI*M_PI*((i+j)%2==0 ? 1 : -1)/(sin(M_PI*(i-j)/N)*sin(M_PI*(i-j)/N))/(N*N);
@@ -84,7 +87,7 @@ int main(int argc, char** argv) {
         for (int i = 1; i <= N; ++i) {
             for (int j = 1; j <= N; ++j) {
                 if (i == j) {
-                    H[IDX_CM(N,i,j)] = 2.0 + P*P*config.a*config.a*(i-N/2)*(i-N/2);
+                    H[IDX_CM(N,i,j)] = 2.0 + omega*omega*a*a*a*a*(i+x0)*(i+x0);
                 }
                 else if (i-j==1 || j-i==1) {
                     H[IDX_CM(N,i,j)] = -1.0;
@@ -117,13 +120,14 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i != N; ++i) {
         /* First column: E/hw, second: deltaE/hw*/
-        fprintf(f_eval, "%.26le\t%.26le\n", w[i]/(2*P*config.a), fabs(w[i]/(2*P*config.a)-(i+0.5)));
+        fprintf(f_eval, "%.26le\t%.26le\n", w[i]/(2*a*a*omega), fabs(w[i]/(2*a*a*omega)-(i+0.5)));
     }
 
-    /* Writing out only 50 first eigenvectors */
+    /* Writing out only 32 first eigenvectors */
+    const int N_or_32 = N < 32 ? N : 32;
     for (int j = 1; j <= N; ++j) {
-        for (int i = 1; i <= 50; ++i) {
-            fprintf(f_evec, "%.6le ", z[IDX_CM(N,j,i)]);
+        for (int i = 1; i <= N_or_32; ++i) {
+            fprintf(f_evec, "%.20le ", z[IDX_CM(N,j,i)]);
         }
         fputc('\n', f_evec);
     }
@@ -155,5 +159,6 @@ void usage (FILE* fp, const char* path) {
         "\t\tuseDVR:True/False\n"
         "\t\tN:int\n"
         "\t\ta:real\n"
-        "\t\tp:real\n");
+        "\t\tomega:real\n"
+        "\t\tx0:int\t(Measured in a)\n");
 }

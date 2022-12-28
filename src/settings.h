@@ -10,7 +10,8 @@ typedef struct {
     bool onlyValues;
     int N;
     double a;
-    double p;
+    double omega;
+    int x0;
 } Config;
 
 

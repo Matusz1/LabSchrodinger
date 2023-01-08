@@ -1,16 +1,22 @@
-# How to run and change setting
+# How to run and change settings
+
 Typical way to run the program:
+
     ./LabSchrodinger a=0.5 N=512
 
-You can optionaly changer parameters using command line options as is shown above by writing 'VAR=VALUE', you can change
-    - highPrecision=True/False (default = True)
-    - onlyValues=True/False    (default = False)
-    - N=int                    (default = 256)
-    - a=double                 (default = 1.0)
-    - omega=double             (default = 0.05)
-    - x0=int                   (default = -N/2)
-    - HO=True/False            (default = True)
+You can optionaly change parameters using command line arguments, as is shown above by writing 'VAR=VALUE', you can change
+<ul>
+    <li>highPrecision=True/False (default = True)</li>
+    <li>onlyValues=True/False    (default = False)</li>
+    <li>N=int                    (default = 256)</li>
+    <li>a=double                 (default = 1.0)</li>
+    <li>omega=double             (default = 0.05)</li>
+    <li>x0=int                   (default = -N/2)</li>
+    <li>HO=True/False            (default = True)</li>
+</ul>
 
-Program return:
-    -evalues.txt  (file with eigenvalues in columnt, if HO=True there is second column with deltaE/hw)
-    -evectors.txt (file with eigenvectors, first columnt first eigenvector etc.)
+Programs output:
+<ul>
+    <li>evalues.txt  (file with eigenvalues in columnt, if HO=True there is second column with deltaE/hw)</li>
+    <li>evectors.txt (file with eigenvectors, first columnt first eigenvector etc.)</li>
+</ul>
